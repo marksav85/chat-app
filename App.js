@@ -13,9 +13,9 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   return (
     <NavigationContainer>
-      // Set up the navigation
+      {/*Set up the navigation*/}
       <Stack.Navigator initialRouteName="Start">
-        // Set up the screens
+        {/*Set up the screens*/}
         <Stack.Screen name="Start" component={Start} />
         <Stack.Screen name="Chat" component={Chat} />
       </Stack.Navigator>
