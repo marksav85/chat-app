@@ -9,17 +9,21 @@ import {
 } from "react-native";
 
 const Start = ({ navigation }) => {
+  // Set the states
   const [name, setName] = useState("");
   const [background, setBackground] = useState("");
   const [color, setColor] = useState("");
   return (
     <View style={styles.container}>
+      {/*Set the background image*/}
       <ImageBackground
         source={require("../assets/background-image.png")}
         resizeMode="cover"
         style={styles.image}
       >
+        {/*Set the title*/}
         <Text style={styles.title}>Chat App</Text>
+        {/*Set the input fields*/}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.textInput}
@@ -27,6 +31,7 @@ const Start = ({ navigation }) => {
             onChangeText={setName}
             placeholder="Your Name"
           />
+          {/*Set the background color options using touchable opacity as customised button*/}
           <Text style={styles.bgText}>Choose Background Color:</Text>
           <View style={styles.colorContainer}>
             <TouchableOpacity
@@ -58,6 +63,7 @@ const Start = ({ navigation }) => {
               }}
             />
           </View>
+          {/*Set the start chatting button*/}
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
@@ -68,6 +74,7 @@ const Start = ({ navigation }) => {
               })
             }
           >
+            {/*Set the button text*/}
             <Text style={styles.buttonText}>Start Chatting</Text>
           </TouchableOpacity>
         </View>
@@ -77,6 +84,7 @@ const Start = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  // Set the style of the screen
   container: {
     flex: 1,
   },
