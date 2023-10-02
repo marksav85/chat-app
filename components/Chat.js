@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
+import { KeyboardAvoidingView, Platform } from "react-native";
 
 const Chat = ({ route, navigation }) => {
   // Get the params from the route
@@ -36,13 +37,19 @@ const Chat = ({ route, navigation }) => {
   }, []);
 
   return (
-    <GiftedChat
-      messages={messages}
-      onSend={(messages) => onSend(messages)}
-      user={{
-        _id: 1,
-      }}
-    />
+    <View style={[styles.container, { backgroundColor: background }]}>
+      <GiftedChat
+        messages={messages}
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+      />
+      {/* Set the keyboard avoiding view for Android to avoid keyboard covering textbox*/}
+      {Platform.OS === "android" ? (
+        <KeyboardAvoidingView behavior="height" />
+      ) : null}
+    </View>
   );
 
   /* return (
@@ -57,8 +64,8 @@ const styles = StyleSheet.create({
   // Set the style of the screen
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    /* justifyContent: "center",
+    alignItems: "center", */
   },
   text: {
     flex: 1,
