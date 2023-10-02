@@ -51,7 +51,7 @@ const Chat = ({ route, navigation }) => {
       },
       {
         _id: 2,
-        text: "This is a system message",
+        text: "You've entered the chat",
         createdAt: new Date(),
         system: true,
       },
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   // Set the style of the screen
   container: {
     flex: 1,
+    marginBottom: 30,
     /* justifyContent: "center",
     alignItems: "center", */
   },
