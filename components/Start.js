@@ -8,13 +8,31 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const Start = ({ navigation }) => {
   // Set the states
   const [name, setName] = useState("");
   const [background, setBackground] = useState("");
-  const [color, setColor] = useState("");
+  const auth = getAuth();
+
+  // Sign in anonymously
+  const signInUser = () => {
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate("Chat", {
+          name: name,
+          background: background,
+          userID: result.user.uid,
+        });
+      })
+      .catch((error) => {
+        Alert.alert("Unable to sign in, try later again.");
+      });
+  };
+
   return (
     <View style={styles.container}>
       {/*Set the background image*/}
@@ -49,7 +67,6 @@ const Start = ({ navigation }) => {
               style={[styles.colorButton, styles.color1]}
               onPress={() => {
                 setBackground("#090C08");
-                setColor("white");
               }}
             />
             <TouchableOpacity
@@ -59,7 +76,6 @@ const Start = ({ navigation }) => {
               accessibilityRole="button"
               style={[styles.colorButton, styles.color2]}
               onPress={() => {
-                setColor("#FFFFFF");
                 setBackground("#474056");
               }}
             />
@@ -70,7 +86,6 @@ const Start = ({ navigation }) => {
               accessibilityRole="button"
               style={[styles.colorButton, styles.color3]}
               onPress={() => {
-                setColor("#FFFFFF");
                 setBackground("#8A95A5");
               }}
             />
@@ -81,7 +96,6 @@ const Start = ({ navigation }) => {
               accessibilityRole="button"
               style={[styles.colorButton, styles.color4]}
               onPress={() => {
-                setColor("#FFFFFF");
                 setBackground("#B9C6AE");
               }}
             />
@@ -93,13 +107,7 @@ const Start = ({ navigation }) => {
             accessibilityHint="Button navigates to the chat screen"
             accessibilityRole="button"
             style={styles.button}
-            onPress={() =>
-              navigation.navigate("Chat", {
-                name: name,
-                background: background,
-                color: color,
-              })
-            }
+            onPress={signInUser} // Call the sign in function
           >
             {/*Set the button text*/}
             <Text style={styles.buttonText}>Start Chatting</Text>
