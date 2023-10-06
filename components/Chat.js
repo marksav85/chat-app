@@ -1,18 +1,23 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
-const Chat = ({ route, navigation }) => {
+const Chat = ({ route, navigation, db }) => {
   // Get the params from the route
-  const { name, background, color } = route.params;
+  const { name, background, userID } = route.params;
   // Set the messages state
   const [messages, setMessages] = useState([]);
+
   const onSend = (newMessages) => {
-    // Custom function to call setMessages with new messages which appends to the existing messages
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, newMessages)
-    );
+    // Add the new message to the messages state
+    addDoc(collection(db, "messages"), newMessages[0]);
   };
   // Function to customise chat bubble
   const renderBubble = (props) => {
@@ -37,25 +42,25 @@ const Chat = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    // Set the messages following the GiftedChat format
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-      {
-        _id: 2,
-        text: "You've entered the chat",
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
+    const unsubMessages = onSnapshot(
+      query(collection(db, "messages"), orderBy("createdAt", "desc")), // where("uid", "==", userID)),
+      (documentsSnapshot) => {
+        let newMessages = [];
+        documentsSnapshot.forEach((doc) => {
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: new Date(doc.data().createdAt.toMillis()),
+          });
+        });
+        setMessages(newMessages);
+      }
+    );
+
+    // Clean up code
+    return () => {
+      if (unsubMessages) unsubMessages();
+    };
   }, []);
 
   return (
@@ -66,7 +71,8 @@ const Chat = ({ route, navigation }) => {
         renderBubble={renderBubble}
         onSend={(messages) => onSend(messages)}
         user={{
-          _id: 1,
+          _id: userID,
+          name,
         }}
       />
       {/* Set the keyboard avoiding view for Android to avoid keyboard covering textbox*/}
@@ -75,13 +81,6 @@ const Chat = ({ route, navigation }) => {
       ) : null}
     </View>
   );
-
-  /* return (
-    // Set the background color of the screen
-    <View style={[styles.container, { backgroundColor: background }]}>
-      <Text style={{ color: color }}>Chat Screen</Text>
-    </View>
-  ); */
 };
 
 const styles = StyleSheet.create({
@@ -89,8 +88,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: 30,
-    /* justifyContent: "center",
-    alignItems: "center", */
   },
   text: {
     flex: 1,
