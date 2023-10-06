@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
   addDoc,
@@ -8,8 +8,9 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Chat = ({ route, navigation, db }) => {
+const Chat = ({ route, navigation, db, isConnected }) => {
   // Get the params from the route
   const { name, background, userID } = route.params;
   // Set the messages state
@@ -36,32 +37,58 @@ const Chat = ({ route, navigation, db }) => {
     );
   };
 
+  const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
+    else return null;
+  };
+
   useEffect(() => {
     // Set the title of the screen
     navigation.setOptions({ title: name });
   }, []);
 
+  let unsubMessages;
   useEffect(() => {
-    const unsubMessages = onSnapshot(
-      query(collection(db, "messages"), orderBy("createdAt", "desc")), // where("uid", "==", userID)),
-      (documentsSnapshot) => {
-        let newMessages = [];
-        documentsSnapshot.forEach((doc) => {
-          newMessages.push({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: new Date(doc.data().createdAt.toMillis()),
+    if (isConnected === true) {
+      // unregister current onSnapshot() listener to avoid registering multiple listeners when
+      // useEffect code is re-executed.
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+      unsubMessages = onSnapshot(
+        query(collection(db, "messages"), orderBy("createdAt", "desc")), // order the messages by createdAt in descending order
+        (documentsSnapshot) => {
+          let newMessages = [];
+          documentsSnapshot.forEach((doc) => {
+            newMessages.push({
+              id: doc.id,
+              ...doc.data(),
+              createdAt: new Date(doc.data().createdAt.toMillis()),
+            });
           });
-        });
-        setMessages(newMessages);
-      }
-    );
-
+          cacheMessages(newMessages);
+          setMessages(newMessages);
+        }
+      );
+    } else loadCachedMessages();
     // Clean up code
     return () => {
       if (unsubMessages) unsubMessages();
     };
-  }, []);
+  }, [isConnected]);
+
+  // creates a function that caches the messages
+  const cacheMessages = async (messagesToCache) => {
+    try {
+      await AsyncStorage.setItem("messages", JSON.stringify(messagesToCache));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const loadCachedMessages = async () => {
+    const cachedMessages = (await AsyncStorage.getItem("messages")) || [];
+    setMessages(JSON.parse(cachedMessages));
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
@@ -69,6 +96,7 @@ const Chat = ({ route, navigation, db }) => {
         messages={messages}
         // Render customised chat bubble
         renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
