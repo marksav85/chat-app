@@ -9,6 +9,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./components/CustomActions";
 
 const Chat = ({ route, navigation, db, isConnected }) => {
   // Get the params from the route
