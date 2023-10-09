@@ -37,6 +37,11 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     );
   };
 
+  // Function to customise chat actions
+  const renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
   const renderInputToolbar = (props) => {
     if (isConnected) return <InputToolbar {...props} />;
     else return null;
@@ -97,6 +102,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         // Render customised chat bubble
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
+        renderActions={renderCustomActions}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
