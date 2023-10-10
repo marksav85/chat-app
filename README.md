@@ -62,34 +62,31 @@ before joining the chat.
 - AsyncStorage caching for offline use
 - Firebase cloud storage (for storing images)
 - Expo ImagePicker & MediaLibrary for integrating communication features
-- Expo audio-av
+- Expo Location
+- Expo Audio
 
 ### Set Up:
-- Clone project via terminal: git clone 
-- install compatible version of node: npm install 16.19.0
-- install expo CLI: npm install -g expo-cli
-- create an expo account and login via terminal: expo login
-- download Expo Go on your smartphone, and/or install and set up Android Studio on your computer.
-- install dependencies: npm install
-  -  react-native-safe-area-context 
-  -  react-native-screens 
-  -  react-native-async-storage/async-storage
-  -  react-native-community/netinfo 
-  -  react-navigation/native 
-  -  react-navigation/native-stack 
-  -  expo firebase 
-  -  react-native 
-  -  react-native-gifted-chat 
-  -  react-native-safe-area-context 
-  -  react-native-screens 
-  -  expo-image-picker 
-  -  expo-location 
-  -  react-native-maps
+- Clone project via terminal: *git clone https://github.com/marksav85/chat-app.git*
+- install compatible version of node: *npm install 16.19.0*
+- install expo CLI: *npm install -g expo-cli*
+- install the dependencies by running: *npm install*
+- create an expo account and download Expo Go on your smartphone 
+- Optionally also install and set up Android Studio on your computer.
+- Run *npx expo start* or *expo start* to start app
+- Use on screen QR code to sync with your Expo Go app
 
-Run expo:
-
-npm start, or expo start
-sync Metro Bundler either with your smartphone (you will need to install the expoGo app) or using your device emulator to see the app live.
+### Firebase:
+To configure your own database to work with the app, you'll need to follow these steps:
+- Create an account/login with Google Firebase
+- Go to Firebase Console and create new project
+- Set up Firebase Database:
+    - Under Build follow the steps to create a new Database
+    - Under the Rules tab, adjust rule to 'allow read, write: if **true**' and then Publish
+- Set up Authentication:
+  - Under Authentication, choose Anonymous sign in and enable
+- Set up Configuration:
+    - Under Project Settings, register your App
+    - Copy the firebaseConfig provided and replace Config in App.js of your Chat-App  
 
 
 
