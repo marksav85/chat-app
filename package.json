@@ -23,7 +23,8 @@
     "@react-native-community/netinfo": "9.3.10",
     "expo-image-picker": "~14.3.2",
     "expo-location": "~16.1.0",
-    "react-native-maps": "1.7.1"
+    "react-native-maps": "1.7.1",
+    "expo-av": "~13.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
