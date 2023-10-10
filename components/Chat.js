@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
@@ -11,12 +18,15 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from "./CustomActions";
 import MapView from "react-native-maps";
+import { Audio } from "expo-av";
 
 const Chat = ({ route, navigation, db, isConnected, storage }) => {
   // Get the params from the route
   const { name, background, userID } = route.params;
   // Set the messages state
   const [messages, setMessages] = useState([]);
+  // Set the sound object
+  let soundObject = null;
 
   const onSend = (newMessages) => {
     // Add the new message to the messages state
@@ -67,13 +77,12 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
     else return null;
   };
 
+  let unsubMessages;
+
   useEffect(() => {
     // Set the title of the screen
     navigation.setOptions({ title: name });
-  }, []);
-
-  let unsubMessages;
-  useEffect(() => {
+    // Register onSnapshot() listener only when the user is online
     if (isConnected === true) {
       // unregister current onSnapshot() listener to avoid registering multiple listeners when
       // useEffect code is re-executed.
@@ -98,6 +107,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
     // Clean up code
     return () => {
       if (unsubMessages) unsubMessages();
+      if (soundObject) soundObject.unloadAsync();
     };
   }, [isConnected]);
 
@@ -115,6 +125,30 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
     setMessages(JSON.parse(cachedMessages));
   };
 
+  // Function to render audio bubble
+  const renderAudioBubble = (props) => {
+    return (
+      <View {...props}>
+        <TouchableOpacity
+          style={{ backgroundColor: "#FF0", borderRadius: 10, margin: 5 }}
+          onPress={async () => {
+            if (soundObject) soundObject.unloadAsync();
+
+            const { sound } = await Audio.Sound.createAsync({
+              uri: props.currentMessage.audio,
+            });
+            soundObject = sound;
+            await sound.playAsync();
+          }}
+        >
+          <Text style={{ textAlign: "center", color: "black", padding: 5 }}>
+            Play Sound
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: background }]}>
       <GiftedChat
@@ -124,6 +158,7 @@ const Chat = ({ route, navigation, db, isConnected, storage }) => {
         renderInputToolbar={renderInputToolbar}
         renderActions={renderCustomActions}
         renderCustomView={renderCustomView}
+        renderMessageAudio={renderAudioBubble}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
