@@ -1,6 +1,7 @@
 // import the screens
 import Start from "./components/Start";
 import Chat from "./components/Chat";
+import config from "./config.json";
 // import fireStore
 import { initializeApp } from "firebase/app";
 import {
@@ -34,14 +35,7 @@ const App = () => {
   }, [connectionStatus.isConnected]);
 
   // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyB3qWzgksyRfapKYhJarqeo8WQJ4_EiaT8",
-    authDomain: "chat-app-71cf7.firebaseapp.com",
-    projectId: "chat-app-71cf7",
-    storageBucket: "chat-app-71cf7.appspot.com",
-    messagingSenderId: "27811903188",
-    appId: "1:27811903188:web:882054de0509019abead41",
-  };
+  const firebaseConfig = config.firebase;
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
